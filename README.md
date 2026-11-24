@@ -1,72 +1,76 @@
-# GastosAlDia - Separado por Integrantes
+# Integrante 2: Servicios
 
-Estructura para trabajo en equipo según la guía de la Sesión 12.
+## Responsabilidad
+Implementar la lógica de negocio en `ServicioGastos`, usando el repositorio inyectado por constructor. Aquí van las validaciones de reglas de negocio y los reportes LINQ.
 
-## 📁 Estructura de carpetas
+## Archivos incluidos
 
-```
-GastosAlDia_Integrantes/
-├── 1_Modelos_y_Datos/          → Miguel Angel
+### GastosAlDia.Servicios/
+- `ServicioGastos.cs` - Lógica de negocio completa
+- `GastosAlDia.Servicios.csproj` - Proyecto con referencia a Modelos
 
-│   ├── GastosAlDia.Modelos/
-│   │   ├── CategoriaGasto.cs
-│   │   ├── Gasto.cs
-│   │   ├── IRepositorioGastos.cs
-│   │   └── GastosAlDia.Modelos.csproj
-│   ├── GastosAlDia.Datos/
-│   │   ├── GastosAlDiaContext.cs
-│   │   ├── RepositorioEf.cs
-│   │   └── GastosAlDia.Datos.csproj
-│   └── README.md
-│
-├── 2_Servicios/                → Esteban Ramirez
-│   ├── GastosAlDia.Servicios/
-│   │   ├── ServicioGastos.cs
-│   │   └── GastosAlDia.Servicios.csproj
-│   └── README.md
-│
-└── 3_Ventanas_y_Documentacion/ → David Velasquez
-    ├── GastosAlDia.Escritorio/
-    │   ├── FormPrincipal.cs
-    │   ├── FormPrincipal.Designer.cs
-    │   ├── FormGasto.cs
-    │   ├── FormGasto.Designer.cs
-    │   ├── Program.cs
-    │   └── GastosAlDia.Escritorio.csproj
-    ├── 01_Requerimientos_GastosAlDia.docx
-    ├── 02_Cronograma_GastosAlDia.xlsx
-    ├── 03_GastosAlDia.fprg
-    ├── 04_Codigo_Flowgorithm_CSharp.cs
-    ├── 05_Afiche_GastosAlDia.pptx
-    ├── boceto_pantalla_app.png
-    ├── captura_diagrama_flowgorithm.png
-    └── README.md
+## Qué implementa `ServicioGastos`
+
+### Métodos CRUD
+```csharp
+public List<CategoriaGasto> Categorias() => _repositorio.ObtenerCategorias();
+public List<Gasto> Listar() => _repositorio.ObtenerGastos();
+
+public void Registrar(string descripcion, decimal monto, DateTime fecha, int categoriaGastoId)
+{
+    if (fecha > DateTime.Now)
+        throw new ArgumentException("La fecha no puede ser futura.");
+    _repositorio.Agregar(new Gasto(descripcion, monto, fecha, categoriaGastoId));
+}
+
+public void Actualizar(Gasto gasto)
+{
+    if (gasto.Fecha > DateTime.Now)
+        throw new ArgumentException("La fecha no puede ser futura.");
+    _repositorio.Actualizar(gasto);
+}
+
+public void Eliminar(int id) => _repositorio.Eliminar(id);
 ```
 
-## 🔗 Cómo integrar
+### Reportes LINQ (mínimo 1 requerido - hay 3)
+```csharp
+// 1. Gastos de hoy
+public List<Gasto> GastosDeHoy() =>
+    Listar().Where(g => g.Fecha.Date == DateTime.Today).ToList();
 
-Cada integrante trabaja en su carpeta. Para unir todo en la solución completa:
+// 2. Total por categoría (GroupBy)
+public List<ResumenCategoria> TotalPorCategoria() =>
+    _repositorio.ObtenerGastos()
+        .GroupBy(g => g.CategoriaGasto?.Nombre ?? "Sin categoría")
+        .Select(grp => new ResumenCategoria(grp.Key, grp.Count(), grp.Sum(g => g.Monto)))
+        .OrderByDescending(r => r.Total)
+        .ToList();
 
-1. El **líder** clona el repositorio del equipo y crea la solución base `GastosAlDia.sln` con 4 proyectos
-2. Cada integrante **copia sus archivos** a los proyectos correspondientes en la solución compartida
-3. **Solo el líder** agrega referencias entre proyectos y paquetes NuGet
-4. Todos compilan, confirman y sincronizan
+// 3. Total del mes actual
+public decimal TotalMesActual() =>
+    Listar()
+        .Where(g => g.Fecha.Month == DateTime.Today.Month && g.Fecha.Year == DateTime.Today.Year)
+        .Sum(g => g.Monto);
+```
 
-## ⚠️ Reglas de oro (recordatorio)
+### Record para reportes
+```csharp
+public record ResumenCategoria(string Categoria, int Cantidad, decimal Total);
+```
 
-| Regla | Descripción |
-|-------|-------------|
-| **Un archivo por persona** | Un formulario = 3 archivos (`.cs`, `.Designer.cs`, `.resx`) |
-| **Solo el líder** | Agrega proyectos, referencias y paquetes NuGet |
-| **Sincronizar** | Al llegar, tras cada avance, al irse |
-| **Compilar antes de confirmar** | `Ctrl+Mayús+B` - si no compila, no se confirma |
-| **Mensajes claros** | `Agrega entidad Gasto`, no `cambios` o `asdf` |
-| **Conflictos** | No borrar nada, avisar al instructor |
+## Reglas a seguir
+- **No tocar** Modelos, Datos, ni Ventanas
+- **Validaciones de negocio aquí** (no en el constructor de la entidad):
+  - Fecha no futura
+  - Monto > 0
+  - Descripción obligatoria
+  - Categoría seleccionada
+- El constructor de `Gasto` solo valida reglas que **siempre** se cumplen (ej: "nombre no vacío")
+- Reglas como "fecha no pasada" van en el **servicio** para no fallar al cargar datos históricos
+- Inyección de dependencias: `ServicioGastos(IRepositorioGastos repositorio)`
+- Compilar antes de confirmar
+- Mensajes de commit: `Agrega reporte TotalPorCategoria`, `Valida fecha no futura en Actualizar`, etc.
 
-## ✅ Lista de verificación del jueves 26
-
-- [ ] Se puede **registrar** gasto eligiendo categoría en ComboBox
-- [ ] Se puede **eliminar** y **editar** un registro
-- [ ] Ningún dato inválido cierra la aplicación (ErrorProvider + try/catch)
-- [ ] Al menos **1 reporte LINQ** visible (hay 3: Hoy, Por categoría, Mes actual)
-- [ ] Cada integrante tiene **commits propios**
+## Cómo probar
+La UI (Integrante 3) llama a estos métodos. Para probar aislado, crear test unitario o consola temporal.
