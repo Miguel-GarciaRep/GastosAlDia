@@ -1,0 +1,223 @@
+<?xml version="1.0"?>
+<flowgorithm fileversion="3.0">
+    <attributes>
+        <attribute name="name" value="GastosAlDia"/>
+        <attribute name="authors" value="David Velasquez Alarcon - Equipo GastosAlDia"/>
+        <attribute name="about" value="Aplicacion intuitiva GastosAlDia para controlar ingresos, gastos por categoria y saldo mensual de un aprendiz SENA"/>
+        <attribute name="saved" value="2026-11-23 01:55:00 PM"/>
+    </attributes>
+    <function name="Main" type="None" variable="">
+        <parameters/>
+        <body>
+            <comment text="1. Declaracion de variables del sistema GastosAlDia"/>
+            <declare name="presupuestoInicial" type="Real" array="False" size=""/>
+            <declare name="ingresoExtra" type="Real" array="False" size=""/>
+            <declare name="montoGasto" type="Real" array="False" size=""/>
+            <declare name="totalIngresos" type="Real" array="False" size=""/>
+            <declare name="totalGastos" type="Real" array="False" size=""/>
+            <declare name="saldo" type="Real" array="False" size=""/>
+            <declare name="gastoTransporte" type="Real" array="False" size=""/>
+            <declare name="gastoComida" type="Real" array="False" size=""/>
+            <declare name="gastoInternet" type="Real" array="False" size=""/>
+            <declare name="gastoEstudio" type="Real" array="False" size=""/>
+            <declare name="gastoDiversion" type="Real" array="False" size=""/>
+            <declare name="mayorGasto" type="Real" array="False" size=""/>
+            <declare name="porcentajeGastado" type="Real" array="False" size=""/>
+            <declare name="opcion" type="Integer" array="False" size=""/>
+            <declare name="categoria" type="Integer" array="False" size=""/>
+            <declare name="categoriaMayor" type="String" array="False" size=""/>
+            <comment text="2. Inicializacion de acumuladores en cero"/>
+            <assign variable="totalGastos" expression="0"/>
+            <assign variable="gastoTransporte" expression="0"/>
+            <assign variable="gastoComida" expression="0"/>
+            <assign variable="gastoInternet" expression="0"/>
+            <assign variable="gastoEstudio" expression="0"/>
+            <assign variable="gastoDiversion" expression="0"/>
+            <assign variable="opcion" expression="-1"/>
+            <comment text="3. Pantalla de bienvenida intuitiva para el usuario"/>
+            <output expression="&quot;==================================================&quot;" newline="True"/>
+            <output expression="&quot;            BIENVENIDO A: GastosAlDia&quot;" newline="True"/>
+            <output expression="&quot;         Equipo GastosAlDia - ADSO SENA&quot;" newline="True"/>
+            <output expression="&quot;==================================================&quot;" newline="True"/>
+            <output expression="&quot;Controla tus ingresos y gastos del mes de forma facil.&quot;" newline="True"/>
+            <output expression="&quot;PASO 1: Ingresa tu presupuesto inicial del mes en pesos (ejemplo: 250000):&quot;" newline="True"/>
+            <input variable="presupuestoInicial"/>
+            <comment text="CICLO 1: Validacion para evitar presupuestos negativos o en cero"/>
+            <while expression="presupuestoInicial &lt;= 0">
+                <output expression="&quot;ERROR: El presupuesto debe ser mayor a $0. Escribe un valor valido (ej: 250000):&quot;" newline="True"/>
+                <input variable="presupuestoInicial"/>
+            </while>
+            <assign variable="totalIngresos" expression="presupuestoInicial"/>
+            <assign variable="saldo" expression="presupuestoInicial"/>
+            <comment text="CICLO 2 (PRINCIPAL): Menu interactivo mientras el usuario no elija 0"/>
+            <while expression="opcion != 0">
+                <output expression="&quot;--------------------------------------------------&quot;" newline="True"/>
+                <output expression="&quot;MENU PRINCIPAL GastosAlDia | Saldo disponible: $&quot; &amp; saldo" newline="True"/>
+                <output expression="&quot;1. Registrar un gasto&quot;" newline="True"/>
+                <output expression="&quot;2. Agregar un ingreso extra&quot;" newline="True"/>
+                <output expression="&quot;3. Ver resumen parcial por categorias&quot;" newline="True"/>
+                <output expression="&quot;0. Finalizar y ver reporte final del mes&quot;" newline="True"/>
+                <output expression="&quot;Escribe el numero de tu opcion (0 a 3):&quot;" newline="True"/>
+                <input variable="opcion"/>
+                <comment text="DECISION 1: Evaluar la opcion seleccionada del menu"/>
+                <if expression="opcion == 1">
+                    <then>
+                        <output expression="&quot;--- CATEGORIAS DE GASTO ---&quot;" newline="True"/>
+                        <output expression="&quot;1. Transporte | 2. Comida | 3. Internet/Datos | 4. Estudio | 5. Diversion&quot;" newline="True"/>
+                        <output expression="&quot;Elige el numero de la categoria (1 a 5):&quot;" newline="True"/>
+                        <input variable="categoria"/>
+                        <while expression="categoria &lt; 1 or categoria &gt; 5">
+                            <output expression="&quot;Categoria invalida. Escribe un numero entre 1 y 5:&quot;" newline="True"/>
+                            <input variable="categoria"/>
+                        </while>
+                        <output expression="&quot;Ingresa el valor del gasto en pesos (ejemplo: 15000):&quot;" newline="True"/>
+                        <input variable="montoGasto"/>
+                        <while expression="montoGasto &lt;= 0">
+                            <output expression="&quot;ERROR: El gasto debe ser mayor a $0. Ingresa un monto valido:&quot;" newline="True"/>
+                            <input variable="montoGasto"/>
+                        </while>
+                        <comment text="DECISION 2: Acumular el gasto en la categoria elegida"/>
+                        <if expression="categoria == 1">
+                            <then>
+                                <assign variable="gastoTransporte" expression="gastoTransporte + montoGasto"/>
+                            </then>
+                            <else>
+                                <if expression="categoria == 2">
+                                    <then>
+                                        <assign variable="gastoComida" expression="gastoComida + montoGasto"/>
+                                    </then>
+                                    <else>
+                                        <if expression="categoria == 3">
+                                            <then>
+                                                <assign variable="gastoInternet" expression="gastoInternet + montoGasto"/>
+                                            </then>
+                                            <else>
+                                                <if expression="categoria == 4">
+                                                    <then>
+                                                        <assign variable="gastoEstudio" expression="gastoEstudio + montoGasto"/>
+                                                    </then>
+                                                    <else>
+                                                        <assign variable="gastoDiversion" expression="gastoDiversion + montoGasto"/>
+                                                    </else>
+                                                </if>
+                                            </else>
+                                        </if>
+                                    </else>
+                                </if>
+                            </else>
+                        </if>
+                        <assign variable="totalGastos" expression="totalGastos + montoGasto"/>
+                        <assign variable="saldo" expression="totalIngresos - totalGastos"/>
+                        <output expression="&quot;Gasto registrado con exito. Saldo restante: $&quot; &amp; saldo" newline="True"/>
+                        <if expression="saldo &lt; 0">
+                            <then>
+                                <output expression="&quot;ALERTA: Superaste tu presupuesto por $&quot; &amp; (saldo * -1)" newline="True"/>
+                            </then>
+                            <else/>
+                        </if>
+                    </then>
+                    <else>
+                        <if expression="opcion == 2">
+                            <then>
+                                <output expression="&quot;Ingresa el valor del ingreso extra en pesos (ejemplo: 50000):&quot;" newline="True"/>
+                                <input variable="ingresoExtra"/>
+                                <while expression="ingresoExtra &lt;= 0">
+                                    <output expression="&quot;ERROR: El ingreso debe ser mayor a $0. Ingresa un valor valido:&quot;" newline="True"/>
+                                    <input variable="ingresoExtra"/>
+                                </while>
+                                <assign variable="totalIngresos" expression="totalIngresos + ingresoExtra"/>
+                                <assign variable="saldo" expression="totalIngresos - totalGastos"/>
+                                <output expression="&quot;Ingreso agregado. Nuevo saldo disponible: $&quot; &amp; saldo" newline="True"/>
+                            </then>
+                            <else>
+                                <if expression="opcion == 3">
+                                    <then>
+                                        <output expression="&quot;--- RESUMEN PARCIAL GastosAlDia ---&quot;" newline="True"/>
+                                        <output expression="&quot;Ingresos totales: $&quot; &amp; totalIngresos &amp; &quot; | Gastos totales: $&quot; &amp; totalGastos &amp; &quot; | Saldo: $&quot; &amp; saldo" newline="True"/>
+                                        <output expression="&quot;Transporte: $&quot; &amp; gastoTransporte &amp; &quot; | Comida: $&quot; &amp; gastoComida &amp; &quot; | Internet: $&quot; &amp; gastoInternet &amp; &quot; | Estudio: $&quot; &amp; gastoEstudio &amp; &quot; | Diversion: $&quot; &amp; gastoDiversion" newline="True"/>
+                                    </then>
+                                    <else>
+                                        <if expression="opcion != 0">
+                                            <then>
+                                                <output expression="&quot;Opcion no valida. Por favor escribe 1, 2, 3 o 0 para salir.&quot;" newline="True"/>
+                                            </then>
+                                            <else/>
+                                        </if>
+                                    </else>
+                                </if>
+                            </else>
+                        </if>
+                    </else>
+                </if>
+            </while>
+            <comment text="4. Calculo final de la categoria con mayor gasto"/>
+            <assign variable="mayorGasto" expression="gastoTransporte"/>
+            <assign variable="categoriaMayor" expression="&quot;Transporte&quot;"/>
+            <if expression="gastoComida &gt; mayorGasto">
+                <then>
+                    <assign variable="mayorGasto" expression="gastoComida"/>
+                    <assign variable="categoriaMayor" expression="&quot;Comida&quot;"/>
+                </then>
+                <else/>
+            </if>
+            <if expression="gastoInternet &gt; mayorGasto">
+                <then>
+                    <assign variable="mayorGasto" expression="gastoInternet"/>
+                    <assign variable="categoriaMayor" expression="&quot;Internet / Datos&quot;"/>
+                </then>
+                <else/>
+            </if>
+            <if expression="gastoEstudio &gt; mayorGasto">
+                <then>
+                    <assign variable="mayorGasto" expression="gastoEstudio"/>
+                    <assign variable="categoriaMayor" expression="&quot;Estudio / Materiales&quot;"/>
+                </then>
+                <else/>
+            </if>
+            <if expression="gastoDiversion &gt; mayorGasto">
+                <then>
+                    <assign variable="mayorGasto" expression="gastoDiversion"/>
+                    <assign variable="categoriaMayor" expression="&quot;Diversion&quot;"/>
+                </then>
+                <else/>
+            </if>
+            <assign variable="porcentajeGastado" expression="(totalGastos * 100) / totalIngresos"/>
+            <output expression="&quot;==================================================&quot;" newline="True"/>
+            <output expression="&quot;           REPORTE FINAL - GastosAlDia&quot;" newline="True"/>
+            <output expression="&quot;==================================================&quot;" newline="True"/>
+            <output expression="&quot;Total Ingresos del mes: $&quot; &amp; totalIngresos" newline="True"/>
+            <output expression="&quot;Total Gastado del mes:  $&quot; &amp; totalGastos &amp; &quot; (&quot; &amp; porcentajeGastado &amp; &quot;% del presupuesto)&quot;" newline="True"/>
+            <output expression="&quot;Saldo Final Disponible: $&quot; &amp; saldo" newline="True"/>
+            <output expression="&quot;--- Desglose por Categoria ---&quot;" newline="True"/>
+            <output expression="&quot;1. Transporte: $&quot; &amp; gastoTransporte" newline="True"/>
+            <output expression="&quot;2. Comida: $&quot; &amp; gastoComida" newline="True"/>
+            <output expression="&quot;3. Internet/Datos: $&quot; &amp; gastoInternet" newline="True"/>
+            <output expression="&quot;4. Estudio: $&quot; &amp; gastoEstudio" newline="True"/>
+            <output expression="&quot;5. Diversion: $&quot; &amp; gastoDiversion" newline="True"/>
+            <if expression="mayorGasto &gt; 0">
+                <then>
+                    <output expression="&quot;CATEGORIA CON MAYOR GASTO: &quot; &amp; categoriaMayor &amp; &quot; ($&quot; &amp; mayorGasto &amp; &quot;)&quot;" newline="True"/>
+                </then>
+                <else>
+                    <output expression="&quot;No registraste gastos durante este mes.&quot;" newline="True"/>
+                </else>
+            </if>
+            <if expression="saldo &lt; 0">
+                <then>
+                    <output expression="&quot;CONSEJO: Terminaste el mes en deficit. Revisa tus gastos en &quot; &amp; categoriaMayor &amp; &quot;.&quot;" newline="True"/>
+                </then>
+                <else>
+                    <if expression="porcentajeGastado &gt;= 80">
+                        <then>
+                            <output expression="&quot;CONSEJO: Estuviste muy cerca del limite (80% o mas). Intenta ahorrar un poco mas.&quot;" newline="True"/>
+                        </then>
+                        <else>
+                            <output expression="&quot;FELICITACIONES: Manejaste muy bien tu presupuesto mensual en GastosAlDia.&quot;" newline="True"/>
+                        </else>
+                    </if>
+                </else>
+            </if>
+            <output expression="&quot;Gracias por usar GastosAlDia.&quot;" newline="True"/>
+        </body>
+    </function>
+</flowgorithm>
